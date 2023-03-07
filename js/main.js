@@ -7,21 +7,33 @@ itens.forEach((elemento)=>{
 })
     form.addEventListener('submit', (event) => {
         event.preventDefault()
-        // var nome =  event.target.elements['nome']
-        // var quantidade = event.target.elements['quantidade']
+         var nome =  event.target.elements['nome']
+         var quantidade = event.target.elements['quantidade']
         
        
         const itemAtual ={
             "nome": nome.value,
             "quantidade": quantidade.value
         }
-        criarElemento(itemAtual)
-        itens.push(itemAtual)
+        const existe = itens.find(elemento => elemento.nome === nome.value)
+        
+        
+       
+        
+        if(existe){
+            itemAtual.id = existe.id
+            atualizaElemento(itemAtual)
+            itens[itens.findIndex(elemento => elemento.id === existe.id)] = itemAtual
+        }else{
+            // itemAtual.id = itens.length
+            itemAtual.id = itens[itens.length - 1] ? (itens[itens.length -1]).id + 1 :0;
+            criarElemento(itemAtual)
+            itens.push(itemAtual)
+        }
+        
         localStorage.setItem('itens',JSON.stringify(itens))
-
         nome.value=""
         quantidade.value=""
-
     })
 
 function criarElemento(item){
@@ -30,57 +42,31 @@ function criarElemento(item){
     linha.classList.add("item");
     const strongg = document.createElement("strong")
     strongg.innerHTML = item.quantidade
+    strongg.dataset.id =item.id
     linha.appendChild(strongg)
     linha.innerHTML += item.nome
+    linha.appendChild(botaoDeleta(item.id))
     lista.appendChild(linha)
 
 }
 
+function atualizaElemento(item){
+    document.querySelector("[data-id='"+item.id+"']").innerHTML = item.quantidade
+}
 
-// // Operador lógico que retorna com dados salvos, ou string vazia, utilizando localStorage.getItem, modificando o valor de `string` com JSON.parse()
+function deletaElemento(tag,id){
+    tag.remove()
+    itens.splice(itens.findIndex(elemento => elemento.id === id),1)
+    localStorage.setItem('itens',JSON.stringify(itens))
+}
 
-// const form = document.getElementById("novoItem") 
-// const lista = document.getElementById("lista")
-// const itens = JSON.parse(localStorage.getItem("itens")) || []   
+function botaoDeleta(id){
+    const elementoBotao = document.createElement('button')
+    elementoBotao.innerText = " X "
+    elementoBotao.addEventListener('click', function(){
+        deletaElemento(this.parentNode,id)
+    })
 
-// // Uso do forEach para que todos os itens já escritos na lista sejam mantidos ao atualizar a página 
-// itens.forEach( (elemento) => {    
-//     criaElemento(elemento)
-// } )     
+    return elementoBotao
+}
 
-// // Refatoração do addEventListener para receber as funções extras da função criaElemento
-// form.addEventListener("submit", (evento) => {   
-//     evento.preventDefault()            
-
-//     const nome = evento.target.elements['nome']
-//     const quantidade = evento.target.elements['quantidade']
- 
-//     const itemAtual = {
-//     "nome": nome.value,
-//     "quantidade": quantidade.value
-//     }
-
-//     criaElemento(itemAtual)
-
-//     itens.push(itemAtual)
-
-//     localStorage.setItem("itens", JSON.stringify(itens))
-
-//     nome.value = ""
-//     quantidade.value = ""
-// })
-
-// // Refatoração da função `criaElemento` para que possua apenas a função que faça sentido ao nome. 
-
-// function criaElemento(item) {  
-//     const novoItem = document.createElement('li')
-//     novoItem.classList.add("item")
-
-//     const numeroItem = document.createElement('strong')
-//     numeroItem.innerHTML = item.quantidade
-//     novoItem.appendChild(numeroItem)
-
-//     novoItem.innerHTML += item.nome
-
-//     lista.appendChild(novoItem)
-// }
